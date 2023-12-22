@@ -7,6 +7,9 @@ from pydub.playback import play
 from natsort import natsorted
 from unidecode import unidecode 
 import speech_recognition as sr
+import numpy as np
+import soundfile as sf
+
 
 #------------------------evento create-------------------
 model = vosk.Model("models/vosk-model-small-es-0.42/")
@@ -15,8 +18,11 @@ recognizer=sr.Recognizer()
 mic= sr.Microphone()
 audio = pyaudio.PyAudio()
 tts = pyttsx3.init()
-
-tts.setProperty('voice','Sabina')
+tts.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-MX_SABINA_11.0')
+voces = tts.getProperty('voices')
+for voz in voces:
+    print(voz.id)
+    print(voz.name)
 
 with open("str_orders.json") as file:
     phrases = json.load(file)
@@ -85,11 +91,18 @@ def Say(text):
     tts.save_to_file(text,"temp_speaker.mp3")
     tts.runAndWait()
 
+    audio, samplerate = sf.read("temp_speaker.mp3")
+    delay = int(0.03 * samplerate)
+    atten = 0.72
+    metal = np.zeros_like(audio)
+    metal[delay:] += audio[:-delay] * atten
+    ecospeak = audio + metal
+    os.remove("temp_speaker.mp3")
+    sf.write("temp_speaker.mp3",ecospeak,samplerate)
+
     speak = AudioSegment.from_file("temp_speaker.mp3")
 
 
-    playSFX(6)
-    time.sleep(0.7)
     play(speak)
     playSFX(6)
 
@@ -120,10 +133,13 @@ def subir_volumen():
     result = subprocess.run('nircmd changesysvolume 6900')
     print(result)
     Say("listo, Operador.")
+
+def decir_algo_inteligente():
+    Say("El la historia del Internet, se dicen demasiados mitos desde quién fue su primer usuario, hasta quién podría darle fin a esta gran invento. Sin embargo, si tenemos un dato curioso de Internet y certero, es sobre quién fue la primera persona en usar el correo electrónico y enviar un email, se trata de Raymond Samuel Tomlinson. El cual creó un sistema Arpanet, para enviar correos entre dos usuarios diferentes, en una entrevista declaró que el mensaje de prueba era “QWERTYUIOP”.")
     
 
 #---------------bucle-----------------
-Say("iniciando sistema...")
+Say("iniciando sistemas")
 
 while instance_active:
    main(sleep,Akeys)
