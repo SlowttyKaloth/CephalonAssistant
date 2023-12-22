@@ -1,5 +1,4 @@
 
-
 #------------------librerias---------------------------
 import json,time,pyglet,vosk,pyaudio,os,subprocess,pyttsx3
 from pydub import AudioSegment
@@ -72,7 +71,6 @@ def listenUp(recognizer):
 
             print(inputraw)
             input = unidecode(inputraw)
-
             if input.strip().lower() in phrases:
                 func = globals().get(phrases[input.strip().lower()])    #<-------- obtencion del comando
                 func() # noqa ignorar este error
@@ -105,16 +103,16 @@ def Say(text):
 
     play(speak)
     playSFX(6)
-
-    speak = None
     os.remove("temp_speaker.mp3")
 #------------------------------
 def playSFX(sfxid):
     try:
         playsfx = pyglet.media.load(sfx(sfxid))
         playsfx.play()
+        playsfx.delete()
     except Exception as e:
         Say("Algo está fallando en los sistemas de audio. Generando reporte de errores en consola.")
+        
         print(e)
 #-----------------comandos ----------
 def terminar_programa():
