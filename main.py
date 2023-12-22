@@ -37,15 +37,15 @@ Format = pyaudio.paInt16
 Channels = 1
 Rate = 16000
 Chunk = 1024
-Akeys = ['se balón','ortiz']
+Akeys = ['se balón','sabina']
 sleep = True
 instance_active = True
 
 #-------------main-----------------
-def main(sleep,Akeys):
+def main(Akeys):
     print('sleeping...')
     listen = audio.open(format=Format,channels=Channels,rate=Rate,input=True,frames_per_buffer=Chunk)
-    while sleep:
+    while True:
         data = listen.read(Chunk)
         if vsk.AcceptWaveform(data):
             resultado = vsk.Result()
@@ -57,7 +57,8 @@ def main(sleep,Akeys):
                     listen.close()
                     print("Wake up!")
                     listenUp(recognizer)
-                    sleep = False
+                    break
+            break
 #-----------------funciones-----------------
 
 def listenUp(recognizer):
@@ -91,7 +92,7 @@ def Say(text):
 
     audio, samplerate = sf.read("temp_speaker.mp3")
     delay = int(0.03 * samplerate)
-    atten = 0.72
+    atten = 0.8
     metal = np.zeros_like(audio)
     metal[delay:] += audio[:-delay] * atten
     ecospeak = audio + metal
@@ -140,7 +141,7 @@ def decir_algo_inteligente():
 Say("iniciando sistemas")
 
 while instance_active:
-   main(sleep,Akeys)
+   main(Akeys)
    if sleep == False:
        listenUp(recognizer)
 
