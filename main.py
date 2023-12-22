@@ -1,7 +1,7 @@
 
-#------------------librerias----------------------------
-import json,time,pyglet,vosk,pyaudio,io,os,subprocess
-from gtts import gTTS
+
+#------------------librerias---------------------------
+import json,time,pyglet,vosk,pyaudio,os,subprocess,pyttsx3
 from pydub import AudioSegment
 from pydub.playback import play
 from natsort import natsorted
@@ -14,6 +14,9 @@ vsk = vosk.KaldiRecognizer(model,16000)
 recognizer=sr.Recognizer()
 mic= sr.Microphone()
 audio = pyaudio.PyAudio()
+tts = pyttsx3.init()
+
+tts.setProperty('voice','Sabina')
 
 with open("str_orders.json") as file:
     phrases = json.load(file)
@@ -75,22 +78,19 @@ def listenUp(recognizer):
         
 #--------------------------
 def Say(text):
-    audioBuffer = io.BytesIO()
-    speech = gTTS(text,lang='es-us',slow=False)
+    
     if os.path.exists("temp_speaker.mp3"):
         os.remove("temp_speaker.mp3")
     
-    with open("temp_speaker.mp3","wb") as file:
-        audioBuffer.seek(0)
-        speech.write_to_fp(file)
-        audioBuffer.close()
+    tts.save_to_file(text,"temp_speaker.mp3")
+    tts.runAndWait()
 
-    speak = AudioSegment.from_mp3("temp_speaker.mp3")
-    speakup = speak.speedup(playback_speed =1.3)
+    speak = AudioSegment.from_file("temp_speaker.mp3")
+
 
     playSFX(6)
     time.sleep(0.7)
-    play(speakup)
+    play(speak)
     playSFX(6)
 
     speak = None
