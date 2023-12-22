@@ -8,7 +8,7 @@ from natsort import natsorted
 from unidecode import unidecode 
 import speech_recognition as sr
 
-#------------------------evento create--------------------
+#------------------------evento create-------------------
 model = vosk.Model("models/vosk-model-small-es-0.42/")
 vsk = vosk.KaldiRecognizer(model,16000)
 recognizer=sr.Recognizer()
