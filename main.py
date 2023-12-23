@@ -18,10 +18,10 @@ mic= sr.Microphone()
 audio = pyaudio.PyAudio()
 tts = pyttsx3.init()
 tts.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-MX_SABINA_11.0')
-voces = tts.getProperty('voices')
-for voz in voces:
-    print(voz.id)
-    print(voz.name)
+#voces = tts.getProperty('voices')
+#for voz in voces:
+#    print(voz.id)
+#   print(voz.name)
 
 with open("str_orders.json") as file:
     phrases = json.load(file)
@@ -30,7 +30,7 @@ sfxfiles = os.listdir("sfx/")
 sfxfiles = [sfxfile for sfxfile in sfxfiles if os.path.isfile(os.path.join("sfx/", sfxfile))]
 sortfiles = natsorted(sfxfiles)
 
-def sfx(id):       
+def sfx(id):
     return "sfx/"+sortfiles[id]
 
 Format = pyaudio.paInt16
@@ -92,7 +92,7 @@ def Say(text):
 
     audio, samplerate = sf.read("temp_speaker.mp3")
     delay = int(0.03 * samplerate)
-    atten = 0.8
+    atten = 0.85
     metal = np.zeros_like(audio)
     metal[delay:] += audio[:-delay] * atten
     ecospeak = audio + metal
