@@ -98,9 +98,15 @@ def Say(text):
     
     tts.save_to_file(text,"temp_speaker.mp3")
     tts.runAndWait()
-
+    sample = AudioSegment.from_file("temp_speaker.mp3")
+    aud = sample._spawn(sample.raw_data, overrides={
+    "frame_rate": int(sample.frame_rate *  0.61)})
+    audaccel = aud.speedup(playback_speed = 1.4)
+    audampli = audaccel+10
+    os.remove("temp_speaker.mp3")
+    audampli.export("temp_speaker.mp3",format="mp3")
     audio, samplerate = sf.read("temp_speaker.mp3")
-    delay = int(0.03 * samplerate)
+    delay = int(0.04 * samplerate)
     atten = 0.85
     metal = np.zeros_like(audio)
     metal[delay:] += audio[:-delay] * atten
@@ -165,7 +171,7 @@ def hora():
         if hour > 12:
             hour = hour - 12
         print(hour)
-        Say("Son las "+str(hour)+" "+str(min)+" P m")
+        Say("Son las "+str(hour)+" "+str(min)+" p m")
     else:
         Say("Son las "+str(hour)+" "+str(min)+" a m")
 def fecha():
@@ -194,5 +200,3 @@ while instance_active:
    main(Akeys)
    if sleep == False:
        listenUp(recognizer)
-
- 
