@@ -18,7 +18,7 @@ recognizer=sr.Recognizer()
 mic= sr.Microphone()
 audio = pyaudio.PyAudio()
 tts = pyttsx3.init()
-tts.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-MX_SABINA_11.0')
+tts.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-ES_HELENA_11.0')
 
 with open("comandos.json") as file:
     phrases = json.load(file)
@@ -100,14 +100,14 @@ def Say(text):
     tts.runAndWait()
     sample = AudioSegment.from_file("temp_speaker.mp3")
     aud = sample._spawn(sample.raw_data, overrides={
-    "frame_rate": int(sample.frame_rate *  0.61)})
-    audaccel = aud.speedup(playback_speed = 1.4)
+    "frame_rate": int(sample.frame_rate *  0.75)})
+    audaccel = aud.speedup(playback_speed = 1.25)
     audampli = audaccel+8
     os.remove("temp_speaker.mp3")
     audampli.export("temp_speaker.mp3",format="mp3")
     audio, samplerate = sf.read("temp_speaker.mp3")
-    delay = int(0.04 * samplerate)
-    atten = 0.85
+    delay = int(0.03 * samplerate)
+    atten = 0.80
     metal = np.zeros_like(audio)
     metal[delay:] += audio[:-delay] * atten
     ecospeak = audio + metal
