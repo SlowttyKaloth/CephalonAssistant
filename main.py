@@ -37,7 +37,7 @@ Format = pyaudio.paInt16
 Channels = 1
 Rate = 16000
 Chunk = 1024
-Akeys = ['se balón','sabina']
+Akeys = ['se balón','seis']
 sleep = True
 instance_active = True
 
@@ -102,7 +102,7 @@ def Say(text):
     aud = sample._spawn(sample.raw_data, overrides={
     "frame_rate": int(sample.frame_rate *  0.61)})
     audaccel = aud.speedup(playback_speed = 1.4)
-    audampli = audaccel+10
+    audampli = audaccel+8
     os.remove("temp_speaker.mp3")
     audampli.export("temp_speaker.mp3",format="mp3")
     audio, samplerate = sf.read("temp_speaker.mp3")
