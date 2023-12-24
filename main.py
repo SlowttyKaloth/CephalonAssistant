@@ -135,7 +135,7 @@ def playSFX(sfxid):
 #------------------------------------        
 def terminar_programa():
     global instance_active 
-    Say("adios, cerrando programa")
+    Say("adiós, Operador. apagando")
     time.sleep(0.9)
     print("Fin del programa")
     instance_active = False
@@ -170,7 +170,6 @@ def hora():
     if hour > 11:
         if hour > 12:
             hour = hour - 12
-        print(hour)
         Say("Son las "+str(hour)+" "+str(min)+" p m")
     else:
         Say("Son las "+str(hour)+" "+str(min)+" a m")
@@ -180,14 +179,13 @@ def fecha():
     day = fecha.day
     month = fecha.month
     year = fecha.year
-    print(month)
 
     weekname = ["Lunes ", "Martes ", "Miércoles ", "Jueves ", "Viernes ", "Sábado ", "Domingo "]
     monthname = ["Enero ","Febrero ","Marzo ","Abril ","Mayo ","Junio ","Julio ","Agosto ","Septiempre ","Octubre ","Noviembre ","Diciembre "]
     nowweekday = weekname[weekday]
     nowmonth = monthname[month-1]
 
-    Say("hoy es "+ nowweekday + str(day)+" de "+ nowmonth+ "del "+ str(year))
+    Say("hoy es "+ nowweekday + str(day)+" de "+ nowmonth+ "del "+ str(year) +", Operador")
 #--------------------------------------
 def decir_algo_inteligente():
     Say("El la historia del Internet, se dicen demasiados mitos desde quién fue su primer usuario, hasta quién podría darle fin a este gran invento. Sin embargo, si tenemos un dato curioso de Internet y certero, es sobre quién fue la primera persona en usar el correo electrónico y enviar un email, se trata de Raymond Samuel Tomlinson. El cual creó un sistema Arpanet, para enviar correos entre dos usuarios diferentes, en una entrevista declaró que el mensaje de prueba era “QWERTYUIOP”.")
