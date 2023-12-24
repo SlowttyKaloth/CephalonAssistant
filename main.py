@@ -167,7 +167,7 @@ def hora():
         print(hour)
         Say("Son las "+str(hour)+" "+str(min)+" P m")
     else:
-        Say("Son las "+str(hour)+" "+str(min)+" A m")
+        Say("Son las "+str(hour)+" "+str(min)+" a m")
 def fecha():
     fecha = datetime.now()
     weekday = fecha.weekday()
@@ -184,7 +184,7 @@ def fecha():
     Say("hoy es "+ nowweekday + str(day)+" de "+ nowmonth+ "del "+ str(year))
 #--------------------------------------
 def decir_algo_inteligente():
-    Say("El la historia del Internet, se dicen demasiados mitos desde quién fue su primer usuario, hasta quién podría darle fin a esta gran invento. Sin embargo, si tenemos un dato curioso de Internet y certero, es sobre quién fue la primera persona en usar el correo electrónico y enviar un email, se trata de Raymond Samuel Tomlinson. El cual creó un sistema Arpanet, para enviar correos entre dos usuarios diferentes, en una entrevista declaró que el mensaje de prueba era “QWERTYUIOP”.")
+    Say("El la historia del Internet, se dicen demasiados mitos desde quién fue su primer usuario, hasta quién podría darle fin a este gran invento. Sin embargo, si tenemos un dato curioso de Internet y certero, es sobre quién fue la primera persona en usar el correo electrónico y enviar un email, se trata de Raymond Samuel Tomlinson. El cual creó un sistema Arpanet, para enviar correos entre dos usuarios diferentes, en una entrevista declaró que el mensaje de prueba era “QWERTYUIOP”.")
     
 
 #---------------bucle-----------------
