@@ -1,6 +1,7 @@
 
 #------------------librerias---------------------------
-import json,time,pyglet,vosk,pyaudio,os,subprocess,pyttsx3
+import json,time,pyglet,vosk,pyaudio,os,subprocess,pyttsx3,random
+from datetime import datetime
 from pydub import AudioSegment
 from pydub.playback import play
 from natsort import natsorted
@@ -18,13 +19,12 @@ mic= sr.Microphone()
 audio = pyaudio.PyAudio()
 tts = pyttsx3.init()
 tts.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-MX_SABINA_11.0')
-#voces = tts.getProperty('voices')
-#for voz in voces:
-#    print(voz.id)
-#   print(voz.name)
 
-with open("str_orders.json") as file:
+with open("comandos.json") as file:
     phrases = json.load(file)
+
+with open("dialogos.json") as file:
+    dialogs = json.load(file)
 
 sfxfiles = os.listdir("sfx/")
 sfxfiles = [sfxfile for sfxfile in sfxfiles if os.path.isfile(os.path.join("sfx/", sfxfile))]
@@ -72,12 +72,21 @@ def listenUp(recognizer):
 
             print(inputraw)
             input = unidecode(inputraw)
-            if input.strip().lower() in phrases:
-                func = globals().get(phrases[input.strip().lower()])    #<-------- obtencion del comando
+            command = None
+
+            for clave, valores in phrases.items():
+                if input.strip().lower() in valores:
+                    command = clave
+                    break
+            
+            
+            if command != None:
+                func = globals().get(command)    #<-------- obtencion del comando
                 func() # noqa ignorar este error
             else:
                 Say("disculpe, no entendí eso")
-        except:
+        except Exception as e:
+            print(e)
             Say("el modulo de reconocimiento no entendió eso. inténtelo de nuevo")
             
         
@@ -116,23 +125,64 @@ def playSFX(sfxid):
         
         print(e)
 #-----------------comandos ----------
+#-------------------------------------
+#------------------------------------        
 def terminar_programa():
     global instance_active 
     Say("adios, cerrando programa")
     time.sleep(0.9)
     print("Fin del programa")
     instance_active = False
-
+#----------------------------
 def bajar_volumen():
     result = subprocess.run('nircmd changesysvolume -6900')
     print(result)
-    Say("listo, Operador.")
+    Say(random.choice(dialogs['afirmacion']))
 
 def subir_volumen():
     result = subprocess.run('nircmd changesysvolume 6900')
     print(result)
-    Say("listo, Operador.")
+    Say(random.choice(dialogs['afirmacion']))
 
+def silenciar_volumen():
+    result = subprocess.run('nircmd mutesysvolume 1')
+    print(result)
+    Say(random.choice(dialogs['afirmacion']))
+
+def activar_volumen():
+    result = subprocess.run('nircmd mutesysvolume 0')
+    print(result)
+    Say(random.choice(dialogs['afirmacion']))
+
+def hora():
+    hora = datetime.now().time()
+    hour = hora.hour
+    min = hora.minute
+    if min == 0:
+        min = "en punto"
+
+    if hour > 11:
+        if hour > 12:
+            hour = hour - 12
+        print(hour)
+        Say("Son las "+str(hour)+" "+str(min)+" P m")
+    else:
+        Say("Son las "+str(hour)+" "+str(min)+" A m")
+def fecha():
+    fecha = datetime.now()
+    weekday = fecha.weekday()
+    day = fecha.day
+    month = fecha.month
+    year = fecha.year
+    print(month)
+
+    weekname = ["Lunes ", "Martes ", "Miércoles ", "Jueves ", "Viernes ", "Sábado ", "Domingo "]
+    monthname = ["Enero ","Febrero ","Marzo ","Abril ","Mayo ","Junio ","Julio ","Agosto ","Septiempre ","Octubre ","Noviembre ","Diciembre "]
+    nowweekday = weekname[weekday]
+    nowmonth = monthname[month-1]
+
+    Say("hoy es "+ nowweekday + str(day)+" de "+ nowmonth+ "del "+ str(year))
+#--------------------------------------
 def decir_algo_inteligente():
     Say("El la historia del Internet, se dicen demasiados mitos desde quién fue su primer usuario, hasta quién podría darle fin a esta gran invento. Sin embargo, si tenemos un dato curioso de Internet y certero, es sobre quién fue la primera persona en usar el correo electrónico y enviar un email, se trata de Raymond Samuel Tomlinson. El cual creó un sistema Arpanet, para enviar correos entre dos usuarios diferentes, en una entrevista declaró que el mensaje de prueba era “QWERTYUIOP”.")
     

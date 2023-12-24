@@ -1,0 +1,10 @@
+{
+    "terminar_programa": ["apagate","desactivate","deten tu programa"],
+    "bajar_volumen": ["bajale","bajar el volumen","baja el volumen","bajar volumen"],
+    "subir_volumen": ["sube el volumen","sube volumen","subele al volumen","subir el volumen","subir volumen","subele"],
+    "silenciar_volumen": ["silencio","silenciar"],
+    "activar_volumen": ["activa volumen","activar el sonido","activa el sonido","activar sonido","activa el volumen","activar volumen"],
+    "hora": ["que hora es","que hora son","que horas es","que horas son","cual es la hora","hora", "la hora"],
+    "decir_algo_inteligente": ["di algo inteligente"],
+    "fecha": ["que fecha es","que fecha es hoy", "que dia es hoy", "a cuanto estamos","a cuanto estamos hoy","que dia es", "cual es la fecha","fecha"]
+}
