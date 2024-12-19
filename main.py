@@ -21,7 +21,7 @@ mic= sr.Microphone()
 audio = pyaudio.PyAudio()
 client = texttospeech.TextToSpeechClient.from_service_account_json("key.json")
 voice = texttospeech.VoiceSelectionParams(
-    language_code="es-MX",  # Código de idioma (español de España)
+    language_code="es-MX", 
     ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL  # Género de la voz
 )
 audio_config = texttospeech.AudioConfig(
@@ -51,7 +51,6 @@ Channels = 1
 Rate = 16000
 Chunk = 1024
 Akeys = ['astra','hasta','trump']
-sleep = True
 instance_active = True
 
 #-------------main-----------------
@@ -109,25 +108,13 @@ def listenUp(recognizer):
 def Say(text):
     synthesis_input = texttospeech.SynthesisInput(text=text)
     start = time.time()
-    #tts = gTTS(text=text,lang='es')
-    #tts.save("temp.mp3")
     response = client.synthesize_speech(
     input=synthesis_input, voice=voice, audio_config=audio_config)
-    
-    
     audio_file = io.BytesIO(response.audio_content)
-
     aud = AudioSegment.from_file(audio_file)
-    #aud = sample._spawn(sample.raw_data, overrides={
-    #"frame_rate": int(sample.frame_rate *  0.95)})#tono de voz def 1.03
-    #aud = aud.speedup(playback_speed = 1.22)#velocidad de audio def 1.3
-    #aud = aud+5#volumen def 5
     temp_wav = io.BytesIO()
     aud.export(temp_wav,format="wav")
     samples, samplerate = sf.read(temp_wav)
-
-    print(samplerate)
-
     delay = int(0.02 * samplerate)#retraso del eco def 0.02
     atten = 0.80 ##ecos 0.80
     metal = np.zeros_like(samples)
@@ -147,7 +134,6 @@ def playSFX(sfxid):
     try:
         playsfx = pyglet.media.load(sfx(sfxid))
         playsfx.play()
-        ##playsfx.delete()
     except Exception as e:
         Say("Algo está fallando en los sistemas de audio. Generando reporte de errores en consola.")
         
@@ -217,6 +203,4 @@ def decir_algo_inteligente():
 Say("Programa iniciado. escuchando...")
 
 while instance_active:
-   main(Akeys)
-   if sleep == False:
-       listenUp(recognizer)
+    main(Akeys)
