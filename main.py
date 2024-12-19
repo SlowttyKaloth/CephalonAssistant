@@ -1,6 +1,8 @@
 
 #------------------librerias---------------------------
-import json,time,pyglet,vosk,pyaudio,os,subprocess,pyttsx3,random
+import json,time,pyglet,pyaudio,os,subprocess,random,vosk, io
+from gtts import gTTS
+from google.cloud import texttospeech
 from datetime import datetime
 from pydub import AudioSegment
 from pydub.playback import play
@@ -17,14 +19,25 @@ vsk = vosk.KaldiRecognizer(model,16000)
 recognizer=sr.Recognizer()
 mic= sr.Microphone()
 audio = pyaudio.PyAudio()
-tts = pyttsx3.init()
-tts.setProperty('voice','HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_ES-ES_HELENA_11.0')
+client = texttospeech.TextToSpeechClient.from_service_account_json("key.json")
+voice = texttospeech.VoiceSelectionParams(
+    language_code="es-MX",  # Código de idioma (español de España)
+    ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL  # Género de la voz
+)
+audio_config = texttospeech.AudioConfig(
+    audio_encoding=texttospeech.AudioEncoding.LINEAR16,  # Formato WAV (PCM)
+    speaking_rate = 1.15,
+    pitch = 0.60
+)
 
 with open("comandos.json") as file:
     phrases = json.load(file)
 
 with open("dialogos.json") as file:
     dialogs = json.load(file)
+
+with open("key.json") as file:
+    key = json.load(file)
 
 sfxfiles = os.listdir("sfx/")
 sfxfiles = [sfxfile for sfxfile in sfxfiles if os.path.isfile(os.path.join("sfx/", sfxfile))]
@@ -37,7 +50,7 @@ Format = pyaudio.paInt16
 Channels = 1
 Rate = 16000
 Chunk = 1024
-Akeys = ['se balón','zeus']
+Akeys = ['astra','hasta','trump']
 sleep = True
 instance_active = True
 
@@ -87,45 +100,54 @@ def listenUp(recognizer):
                 Say("disculpe, no entendí eso")
         except Exception as e:
             print(e)
+            import traceback
+            traceback.print_exc()
             Say("el modulo de reconocimiento no entendió eso. inténtelo de nuevo")
             
         
 #--------------------------
 def Say(text):
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+    start = time.time()
+    #tts = gTTS(text=text,lang='es')
+    #tts.save("temp.mp3")
+    response = client.synthesize_speech(
+    input=synthesis_input, voice=voice, audio_config=audio_config)
     
-    if os.path.exists("temp_speaker.mp3"):
-        os.remove("temp_speaker.mp3")
     
-    tts.save_to_file(text,"temp_speaker.mp3")
-    tts.runAndWait()
-    sample = AudioSegment.from_file("temp_speaker.mp3")
-    aud = sample._spawn(sample.raw_data, overrides={
-    "frame_rate": int(sample.frame_rate *  0.77)})
-    audaccel = aud.speedup(playback_speed = 1.13)
-    audampli = audaccel+8
-    os.remove("temp_speaker.mp3")
-    audampli.export("temp_speaker.mp3",format="mp3")
-    audio, samplerate = sf.read("temp_speaker.mp3")
-    delay = int(0.03 * samplerate)
-    atten = 0.80
-    metal = np.zeros_like(audio)
-    metal[delay:] += audio[:-delay] * atten
-    ecospeak = audio + metal
-    os.remove("temp_speaker.mp3")
-    sf.write("temp_speaker.mp3",ecospeak,samplerate)
+    audio_file = io.BytesIO(response.audio_content)
 
-    speak = AudioSegment.from_file("temp_speaker.mp3")
+    aud = AudioSegment.from_file(audio_file)
+    #aud = sample._spawn(sample.raw_data, overrides={
+    #"frame_rate": int(sample.frame_rate *  0.95)})#tono de voz def 1.03
+    #aud = aud.speedup(playback_speed = 1.22)#velocidad de audio def 1.3
+    #aud = aud+5#volumen def 5
+    temp_wav = io.BytesIO()
+    aud.export(temp_wav,format="wav")
+    samples, samplerate = sf.read(temp_wav)
 
+    print(samplerate)
 
+    delay = int(0.02 * samplerate)#retraso del eco def 0.02
+    atten = 0.80 ##ecos 0.80
+    metal = np.zeros_like(samples)
+    metal[delay:] += samples[:-delay] * atten
+    ecospeak = samples + metal
+    final_audio_file = io.BytesIO()
+    sf.write(final_audio_file,ecospeak,samplerate,format="wav")
+    final_audio_file.seek(0)
+    speak = AudioSegment.from_file(final_audio_file)
+    print(str(time.time()-start)+" ms")
     play(speak)
     playSFX(6)
-    os.remove("temp_speaker.mp3")
+    audio_file.seek(0)
+    final_audio_file.seek(0)   
 #------------------------------
 def playSFX(sfxid):
     try:
         playsfx = pyglet.media.load(sfx(sfxid))
         playsfx.play()
-        playsfx.delete()
+        ##playsfx.delete()
     except Exception as e:
         Say("Algo está fallando en los sistemas de audio. Generando reporte de errores en consola.")
         
@@ -185,14 +207,14 @@ def fecha():
     nowweekday = weekname[weekday]
     nowmonth = monthname[month-1]
 
-    Say("hoy es "+ nowweekday + str(day)+" de "+ nowmonth+ "del "+ str(year) +", Operador")
+    Say("hoy es "+ nowweekday + str(day)+" de "+ nowmonth+ "del "+ str(year) +" Operador")
 #--------------------------------------
 def decir_algo_inteligente():
-    Say("El la historia del Internet, se dicen demasiados mitos, desde quién fue su primer usuario, hasta quién podría darle fin a este gran invento. Sin embargo, si tenemos un dato curioso de Internet y certero, es sobre quién fue la primera persona en usar el correo electrónico y enviar un email. se trata de Raymond Samuel Tomlinson. El cual creó un sistema Arpanet, para enviar correos entre dos usuarios diferentes. en una entrevista declaró que el mensaje de prueba era “QWERTYUIOP”.")
+    Say("¡Hola! Soy un asistente virtual creado para ayudarte. Hoy vamos a probar cómo se convierte este texto a voz utilizando la tecnología de síntesis de voz en español. La pronunciación y entonación son muy importantes para que el mensaje suene natural. La inteligencia artificial está mejorando cada día, y ahora puede generar voces muy realistas. ¡Es increíble cómo la tecnología avanza! Espero que este texto sea útil para realizar tu prueba.")
     
 
 #---------------bucle-----------------
-Say("iniciando sistemas")
+Say("Programa iniciado. escuchando...")
 
 while instance_active:
    main(Akeys)
